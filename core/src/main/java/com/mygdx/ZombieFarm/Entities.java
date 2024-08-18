@@ -5,14 +5,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Entities {
-	int timer;
-	int length;
+	int timer, length;
 	boolean timerDone;
 	Texture image;
-	float x;
-	float y;
+	float x, y;
+	float xHB, yHB, wHB, hHB;
 	int speed;
-	Rectangle hitbox;
 
 	public Entities(float x, float y, int speed, Texture image) {
 		timer = 0;
@@ -22,15 +20,28 @@ public class Entities {
 		this.y = y;
 		this.speed = speed;
 		this.image = image;
-		hitbox = new Rectangle(x, y, image.getWidth(), image.getHeight());
+		this.xHB = x;
+		this.yHB = y;
+		this.wHB = image.getWidth();
+		this.hHB = image.getHeight();
+	}
+
+	public Entities(float x, float y, int speed, Texture image, float xHB, float yHB, float wHB, float hHB) {
+		timer = 0;
+		length = 0;
+		timerDone = false;
+		this.x = x;
+		this.y = y;
+		this.speed = speed;
+		this.image = image;
+		this.xHB = xHB;
+		this.yHB = yHB;
+		this.wHB = wHB;
+		this.hHB = hHB;
 	}
 
 	public void batchDraw(SpriteBatch batch) {
 		batch.draw(image, x, y);
-	}
-
-	public void batchDraw(SpriteBatch batch, int sizeW, int sizeH) {
-		batch.draw(image, x, y, sizeW, sizeH);
 	}
 
 	public int getTime() {
@@ -43,29 +54,38 @@ public class Entities {
 		// Bot right x + image.width, y
 		// Top Left x, y + image.height
 		// Top Right x + image.width, y + image.height
-		// first entity
-		boolean checkOne = hitboxCornerCheck(x, y, e) || hitboxCornerCheck(x + image.getWidth(), y, e)
-				|| hitboxCornerCheck(x, y + image.getHeight(), e)
-				|| hitboxCornerCheck(x + image.getWidth(), y + image.getHeight(), e);
+		// first entity yHB
+		boolean checkOne = hitboxCornerCheck(xHB, yHB, e) || hitboxCornerCheck(xHB + wHB, yHB, e)
+				|| hitboxCornerCheck(xHB, yHB + hHB, e) || hitboxCornerCheck(xHB + wHB, yHB + hHB, e);
 		if (checkOne) {
 			return true;
 		}
 		// second entity
-		boolean checkTwo = hitboxCornerCheck(e.x, e.y, this) || hitboxCornerCheck(e.x + e.image.getWidth(), e.y, this)
-				|| hitboxCornerCheck(e.x, e.y + e.image.getHeight(), this)
-				|| hitboxCornerCheck(e.x + e.image.getWidth(), e.y + e.image.getHeight(), this);
+		boolean checkTwo = hitboxCornerCheck(e.xHB, e.yHB, this) || hitboxCornerCheck(e.xHB + e.wHB, e.yHB, this)
+				|| hitboxCornerCheck(e.xHB, e.yHB + e.hHB, this)
+				|| hitboxCornerCheck(e.xHB + e.wHB, e.yHB + e.hHB, this);
 		return checkTwo;
 	}
 
 	public boolean hitboxCornerCheck(float xC, float yC, Entities e) {
 		boolean check = false;
-		if (e.x <= xC && e.x + e.image.getWidth() >= xC && e.y <= yC && e.y + e.image.getHeight() >= yC) {
+		if (e.xHB <= xC && e.xHB + e.wHB >= xC && e.yHB <= yC && e.yHB + e.hHB >= yC) {
 			check = true;
+
 		}
 		return check;
 	}
 
-	public void updatePosition() {
-		hitbox.setPosition(x, y);
+	public void updatePosition(float xHB, float yHB) {
+		this.xHB = xHB;
+		this.yHB = yHB;
+	}
+
+	public void updatePosition(float xHB, float yHB, float wHB, float hHB) {
+
+		this.xHB = xHB;
+		this.yHB = yHB;
+		this.wHB = wHB;
+		this.hHB = hHB;
 	}
 }

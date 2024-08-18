@@ -21,8 +21,11 @@ public class Core extends ApplicationAdapter {
 	BitmapFont font;
 
 	Player player;
+
 	Planted_Zombie pZombie;
 	ArrayList<Planted_Zombie> pZombieList;
+
+	Shop shop;
 	Texture farmbackground;
 
 	// 2000player.xPos 1300
@@ -32,15 +35,17 @@ public class Core extends ApplicationAdapter {
 		batch = new SpriteBatch();
 
 		player = new Player(100, 200, 100, new Texture("Happystar.png")); // xPos,player.yPosPos, speed
-//		pZombie = new Planted_Zombie(0, 0, 0);
+		// pZombie = new Planted_Zombie(0, 0, 0);
 		pZombieList = new ArrayList<>();
 		farmbackground = new Texture("FarmGrass.png");
+
+		// Interacble Buildings
+		shop = new Shop(-100, -100, new Texture("Shop.png"));
 
 		// World Setting
 		camera = new OrthographicCamera(player.x, player.y);
 		camera.setToOrtho(false);
 		font = new BitmapFont();
-		font.getData().setScale(2);
 
 	}
 
@@ -52,19 +57,19 @@ public class Core extends ApplicationAdapter {
 		// Player Checks
 		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
 			player.y = player.y + Gdx.graphics.getDeltaTime() * player.speed;
-			player.updatePosition();
+			player.updatePosition(player.x, player.y);
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
 			player.x = player.x - Gdx.graphics.getDeltaTime() * player.speed;
-			player.updatePosition();
+			player.updatePosition(player.x, player.y);
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
 			player.y = player.y - Gdx.graphics.getDeltaTime() * player.speed;
-			player.updatePosition();
+			player.updatePosition(player.x, player.y);
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
 			player.x = player.x + Gdx.graphics.getDeltaTime() * player.speed;
-			player.updatePosition();
+			player.updatePosition(player.x, player.y);
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.P) && player.plantCooldown() && player.x > 0 && player.y > 0) {
 			player.restartTimer();
@@ -73,7 +78,7 @@ public class Core extends ApplicationAdapter {
 		if (Gdx.input.isKeyPressed(Input.Keys.B) && pZombieList.size() != 0) {
 			for (int i = 0; i < pZombieList.size(); i++) {
 				Planted_Zombie pZ = pZombieList.get(i);
-				if (pZ.hitboxCheck(player)) {
+				if (pZ.isReady() && pZ.hitboxCheck(player)) {
 					player.addCoins(pZ.coinValue);
 					player.addEnergy(pZ.energyValue);
 					pZ.image.dispose();
@@ -90,13 +95,20 @@ public class Core extends ApplicationAdapter {
 		camera.update();
 
 		for (int i = 0; i < pZombieList.size(); i++) {
-			pZombieList.get(i).batchDraw(batch);
+			Planted_Zombie pZ = pZombieList.get(i);
+			pZ.batchDraw(batch);
+
+			font.getData().setScale(1.6f);
+			String timerText = (pZ.lengthRemaining() != 0) ? "Timer: " + pZ.lengthRemaining() : "Ready to Harvest!";
+			font.draw(batch, timerText, pZ.x, pZ.y);
 		}
+//		shop.batchDraw(batch);
 
-		player.batchDraw(batch, 100, 70);
-
+		font.getData().setScale(1.70f);
 		font.draw(batch, "Coins : " + player.coins, 0, 0);
 		font.draw(batch, "Energy : " + player.energy, 150, 0);
+
+		player.batchDraw(batch);
 		batch.setProjectionMatrix(camera.combined);
 		batch.end();
 	}
@@ -109,6 +121,8 @@ public class Core extends ApplicationAdapter {
 			pZombieList.get(i).image.dispose();
 		}
 		farmbackground.dispose();
+		shop.image.dispose();
+		font.dispose();
 	}
 
 }
