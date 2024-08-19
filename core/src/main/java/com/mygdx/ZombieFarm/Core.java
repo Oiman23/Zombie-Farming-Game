@@ -25,7 +25,8 @@ public class Core extends ApplicationAdapter {
 	Planted_Zombie pZombie;
 	ArrayList<Planted_Zombie> pZombieList;
 
-	Shop shop;
+	Inventory inventory;
+	Shop shop; // 290, 940 | 600, 940 | 290, 620 | 600, 620
 	Texture farmbackground;
 
 	// 2000player.xPos 1300
@@ -38,9 +39,10 @@ public class Core extends ApplicationAdapter {
 		// pZombie = new Planted_Zombie(0, 0, 0);
 		pZombieList = new ArrayList<>();
 		farmbackground = new Texture("FarmGrass.png");
+		inventory = new Inventory(new Texture("Inventory.png"));
 
 		// Interacble Buildings
-		shop = new Shop(-100, -100, new Texture("Shop.png"));
+		shop = new Shop(-500, -500, new Texture("Shop.png"));
 
 		// World Setting
 		camera = new OrthographicCamera(player.x, player.y);
@@ -57,19 +59,19 @@ public class Core extends ApplicationAdapter {
 		// Player Checks
 		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
 			player.y = player.y + Gdx.graphics.getDeltaTime() * player.speed;
-			player.updatePosition(player.x, player.y);
+			player.updateHitboxPosition(player.x, player.y);
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
 			player.x = player.x - Gdx.graphics.getDeltaTime() * player.speed;
-			player.updatePosition(player.x, player.y);
+			player.updateHitboxPosition(player.x, player.y);
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
 			player.y = player.y - Gdx.graphics.getDeltaTime() * player.speed;
-			player.updatePosition(player.x, player.y);
+			player.updateHitboxPosition(player.x, player.y);
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
 			player.x = player.x + Gdx.graphics.getDeltaTime() * player.speed;
-			player.updatePosition(player.x, player.y);
+			player.updateHitboxPosition(player.x, player.y);
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.P) && player.plantCooldown() && player.x > 0 && player.y > 0) {
 			player.restartTimer();
@@ -85,6 +87,9 @@ public class Core extends ApplicationAdapter {
 					pZombieList.remove(i);
 				}
 			}
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+
 		}
 
 		// Beging
@@ -102,13 +107,26 @@ public class Core extends ApplicationAdapter {
 			String timerText = (pZ.lengthRemaining() != 0) ? "Timer: " + pZ.lengthRemaining() : "Ready to Harvest!";
 			font.draw(batch, timerText, pZ.x, pZ.y);
 		}
-//		shop.batchDraw(batch);
+		shop.batchDraw(batch);
 
 		font.getData().setScale(1.70f);
 		font.draw(batch, "Coins : " + player.coins, 0, 0);
 		font.draw(batch, "Energy : " + player.energy, 150, 0);
 
 		player.batchDraw(batch);
+
+		if (Gdx.input.isKeyPressed(Input.Keys.E) && inventory.getTime() >= inventory.length) {
+			if (!inventory.open) {
+				inventory.open = !inventory.open;
+				inventory.updatePosition(player.x - 1000, player.y - 700);
+			} else {
+				inventory.open = !inventory.open;
+			}
+			inventory.restartCooldown();
+		}
+		if (inventory.open) {
+			inventory.batchDraw(batch);
+		}
 		batch.setProjectionMatrix(camera.combined);
 		batch.end();
 	}

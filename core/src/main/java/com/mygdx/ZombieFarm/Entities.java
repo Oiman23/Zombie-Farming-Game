@@ -76,12 +76,17 @@ public class Entities {
 		return check;
 	}
 
-	public void updatePosition(float xHB, float yHB) {
+	public void updatePosition(float x, float y) {
+		this.x = x;
+		this.y = y;
+	}
+
+	public void updateHitboxPosition(float xHB, float yHB) {
 		this.xHB = xHB;
 		this.yHB = yHB;
 	}
 
-	public void updatePosition(float xHB, float yHB, float wHB, float hHB) {
+	public void updateHitboxPosition(float xHB, float yHB, float wHB, float hHB) {
 
 		this.xHB = xHB;
 		this.yHB = yHB;
