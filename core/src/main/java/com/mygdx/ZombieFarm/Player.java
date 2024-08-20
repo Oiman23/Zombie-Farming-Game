@@ -6,12 +6,14 @@ public class Player extends Entities {
 	final int planted_zombieTimer = 2;
 	int coins, energy;
 	boolean plantCooldown;
+	Inventory inventory;
 
-	public Player(float x, float y, int speed, Texture image) {
-		super(x, y, speed, image);
+	public Player(float x, float y, int speed) {
+		super(x, y, speed, new Texture("Happystar.png"), 0);
 		coins = 0;
 		energy = 0;
 		plantCooldown = true;
+		this.inventory = new Inventory(0, 0);
 	}
 
 	public boolean plantCooldown() {
