@@ -1,23 +1,29 @@
 package com.mygdx.ZombieFarm;
 
-import java.util.ArrayList;
-
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class Shop extends Entities {
-	ArrayList<Entities> items;
+	Inventory inventory;
 
-	public Shop(float x, float y, Texture image) {
-		super(x, y, 0, image);
-		items = new ArrayList<>();
+	public Shop(float x, float y) {
+		super(x, y, 0, new Texture("Shop.png"), 2);
+		inventory = new Inventory(0, 0);
+		inventory.addItem(new Planted_Zombie(0, 0, 0));
+		inventory.addItem(new Planted_Zombie(0, 0, 0));
+		inventory.addItem(new Planted_Zombie(0, 0, 0));
 	}
 
-	public void showWares() {
-		if (items.size() == 0) {
+	public void showWares(SpriteBatch batch) {
+		
+		int pZSize = inventory.pZList.size();
+		if (pZSize == 0) {
 			System.out.println("shop is empty");
-		}
-		for (int i = 0; i < items.size(); i++) {
-			System.out.println("Planted_zombie");
+		} else {
+			System.out.println("The Items are: ");
+			for (int i = 0; i < pZSize; i++) {
+				System.out.println("pZItem: " + inventory.pZList.get(i));
+			}
 		}
 	}
 

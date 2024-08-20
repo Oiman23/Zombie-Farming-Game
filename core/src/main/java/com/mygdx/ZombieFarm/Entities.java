@@ -5,17 +5,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Entities {
-	int timer, length;
-	boolean timerDone;
+	int timer, length, timerDone;
+
 	Texture image;
 	float x, y;
 	float xHB, yHB, wHB, hHB;
 	int speed;
 
-	public Entities(float x, float y, int speed, Texture image) {
+	public Entities(float x, float y, int speed, Texture image, int length) {
 		timer = 0;
-		length = 0;
-		timerDone = false;
+		this.length = length;
+		timerDone = 0;
 		this.x = x;
 		this.y = y;
 		this.speed = speed;
@@ -29,7 +29,6 @@ public class Entities {
 	public Entities(float x, float y, int speed, Texture image, float xHB, float yHB, float wHB, float hHB) {
 		timer = 0;
 		length = 0;
-		timerDone = false;
 		this.x = x;
 		this.y = y;
 		this.speed = speed;
@@ -47,6 +46,14 @@ public class Entities {
 	public int getTime() {
 		timer = (int) (System.currentTimeMillis() / 1000);
 		return timer;
+	}
+
+	public boolean checkTimer() {
+		return getTime() >= timerDone;
+	}
+
+	public void startTimer() {
+		timerDone = getTime() + length;
 	}
 
 	public boolean hitboxCheck(Entities e) {
@@ -79,11 +86,8 @@ public class Entities {
 	public void updatePosition(float x, float y) {
 		this.x = x;
 		this.y = y;
-	}
-
-	public void updateHitboxPosition(float xHB, float yHB) {
-		this.xHB = xHB;
-		this.yHB = yHB;
+		this.xHB = x;
+		this.yHB = y;
 	}
 
 	public void updateHitboxPosition(float xHB, float yHB, float wHB, float hHB) {
@@ -93,4 +97,5 @@ public class Entities {
 		this.wHB = wHB;
 		this.hHB = hHB;
 	}
+
 }

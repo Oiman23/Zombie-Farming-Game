@@ -35,14 +35,15 @@ public class Core extends ApplicationAdapter {
 		// Sprites
 		batch = new SpriteBatch();
 
-		player = new Player(100, 200, 100, new Texture("Happystar.png")); // xPos,player.yPosPos, speed
+		player = new Player(100, 200, 100); // xPos,player.yPosPos, speed
 		// pZombie = new Planted_Zombie(0, 0, 0);
 		pZombieList = new ArrayList<>();
 		farmbackground = new Texture("FarmGrass.png");
-		inventory = new Inventory(new Texture("Inventory.png"));
+		inventory = new Inventory(0, 0);
+		inventory.addItem(new Planted_Zombie(0, 0, 0));
 
 		// Interacble Buildings
-		shop = new Shop(-500, -500, new Texture("Shop.png"));
+		shop = new Shop(-500, -500);
 
 		// World Setting
 		camera = new OrthographicCamera(player.x, player.y);
@@ -57,39 +58,43 @@ public class Core extends ApplicationAdapter {
 		ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
 
 		// Player Checks
-		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-			player.y = player.y + Gdx.graphics.getDeltaTime() * player.speed;
-			player.updateHitboxPosition(player.x, player.y);
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-			player.x = player.x - Gdx.graphics.getDeltaTime() * player.speed;
-			player.updateHitboxPosition(player.x, player.y);
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-			player.y = player.y - Gdx.graphics.getDeltaTime() * player.speed;
-			player.updateHitboxPosition(player.x, player.y);
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-			player.x = player.x + Gdx.graphics.getDeltaTime() * player.speed;
-			player.updateHitboxPosition(player.x, player.y);
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.P) && player.plantCooldown() && player.x > 0 && player.y > 0) {
-			player.restartTimer();
-			pZombieList.add(new Planted_Zombie(player.x, player.y, 0));
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.B) && pZombieList.size() != 0) {
-			for (int i = 0; i < pZombieList.size(); i++) {
-				Planted_Zombie pZ = pZombieList.get(i);
-				if (pZ.isReady() && pZ.hitboxCheck(player)) {
-					player.addCoins(pZ.coinValue);
-					player.addEnergy(pZ.energyValue);
-					pZ.image.dispose();
-					pZombieList.remove(i);
+		if (!inventory.open && !shop.inventory.open) {
+			if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+				player.y = player.y + Gdx.graphics.getDeltaTime() * player.speed;
+				player.updatePosition(player.x, player.y);
+			}
+			if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+				player.x = player.x - Gdx.graphics.getDeltaTime() * player.speed;
+				player.updatePosition(player.x, player.y);
+			}
+			if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+				player.y = player.y - Gdx.graphics.getDeltaTime() * player.speed;
+				player.updatePosition(player.x, player.y);
+			}
+			if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+				player.x = player.x + Gdx.graphics.getDeltaTime() * player.speed;
+				player.updatePosition(player.x, player.y);
+			}
+			if (Gdx.input.isKeyPressed(Input.Keys.P) && inventory.pZList.size() != 0 && player.plantCooldown()
+					&& player.x > 0 && player.y > 0) {
+				player.restartTimer();
+				Planted_Zombie pZTemp = inventory.pZList.get(0);
+				inventory.removeItem(pZTemp);
+				pZombieList.add(pZTemp);
+				pZTemp.updatePosition(player.x, player.y);
+				pZTemp.startTimer();
+			}
+			if (Gdx.input.isKeyPressed(Input.Keys.B) && pZombieList.size() != 0) {
+				for (int i = 0; i < pZombieList.size(); i++) {
+					Planted_Zombie pZ = pZombieList.get(i);
+					if (pZ.isReady() && pZ.hitboxCheck(player)) {
+						player.addCoins(pZ.coinValue);
+						player.addEnergy(pZ.energyValue);
+						pZ.image.dispose();
+						pZombieList.remove(i);
+					}
 				}
 			}
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-
 		}
 
 		// Beging
@@ -115,17 +120,20 @@ public class Core extends ApplicationAdapter {
 
 		player.batchDraw(batch);
 
-		if (Gdx.input.isKeyPressed(Input.Keys.E) && inventory.getTime() >= inventory.length) {
-			if (!inventory.open) {
-				inventory.open = !inventory.open;
-				inventory.updatePosition(player.x - 1000, player.y - 700);
-			} else {
-				inventory.open = !inventory.open;
-			}
-			inventory.restartCooldown();
+		if (Gdx.input.isKeyPressed(Input.Keys.E) && inventory.checkTimer() && !shop.inventory.open) {
+			inventory.open = !inventory.open;
+			inventory.startTimer();
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && player.hitboxCheck(shop) && shop.checkTimer()
+				&& !inventory.open) {
+			shop.inventory.open = !shop.inventory.open;
+			shop.startTimer();
+			shop.showWares(batch);
 		}
 		if (inventory.open) {
-			inventory.batchDraw(batch);
+			inventory.inventoryOpen(batch, player.x, player.y);
+		} else if (shop.inventory.open) {
+			shop.inventory.inventoryOpen(batch, player.x, player.y);
 		}
 		batch.setProjectionMatrix(camera.combined);
 		batch.end();
