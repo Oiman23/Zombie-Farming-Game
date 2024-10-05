@@ -134,7 +134,7 @@ public class Core extends ApplicationAdapter {
 			inventory.inventoryOpen(batch, player.x, player.y);
 		} else if (shop.inventory.open) {
 			shop.inventory.inventoryOpen(batch, player.x, player.y);
-		}
+		} // test
 		batch.setProjectionMatrix(camera.combined);
 		batch.end();
 	}
